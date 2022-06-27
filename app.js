@@ -12,6 +12,7 @@ var routes = require('./router');
 
 
 app.use('/vttq',routes);
+app.use("/static", express.static(path.resolve(__dirname, "public", "static")))
 
 var server = app.listen(process.env.PORT || 3000, () => {
   console.log("server running!!!");
