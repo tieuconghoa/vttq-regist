@@ -76,9 +76,11 @@
                 success: result => {
                     if (result.code == "ER_DUP_ENTRY") {
                         $("#message").addClass("alert-danger");
+                        $("#message").removeClass("alert-success");
                         $("#message").text("Tài khoản này đã được đăng ký!");
                     } else {
                         $("#message").addClass("alert-success");
+                        $("#message").removeClass("alert-danger");
                         $("#message").text("bạn đã đăng ký thành công, vui lòng lưu lại mã sau: " + result);
                     }
                 }
