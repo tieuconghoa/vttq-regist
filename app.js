@@ -13,8 +13,12 @@ var routes = require('./router');
 
 app.use('/vttq',routes);
 
-var server = app.listen(3000, function() {
-  console.log('Server listening on port ' + server.address().port);
+var server = app.listen(process.env.PORT || 3000, () => {
+  console.log("server running!!!");
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 module.exports = app;
