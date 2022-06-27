@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+
+<body class="container">
+    <div class="">
+        <div class="alert" id="message"></div>
+    </div>
+    <form action="" id="form">
+        <div class="form-row mt-2">
+            <div class="form-group col-md-6">
+                <label for=""> Id game: </label>
+                <input type="text" class="form-control" name="id" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Tên nhân vật:</label>
+                <input type="text" class="form-control" name="name" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Cụm:</label>
+                <select type="text" class="form-control form-select" name="cluster" required>
+                    <option value="0" selected></option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Server</label>
+                <select type="text" class="form-control" name="server" required>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <button type="button" id="btnRegist" class="btn btn-success">Gửi</button>
+        </div>
+    </form>
+</body>
+
+<script>
+    // const url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
+    const url = "http://localhost:3000"
+    $(document).ready(() => {
+        $.get(`${url}/vttq/group`, function (data, status) {
+            data.forEach(element => {
+                $("select[name='cluster']").append(new Option(element.cluster_name, element.cluster));
+            });
+        });
+    })
+
+    $("select[name='cluster']").change(() => {
+        let id = $("select[name='cluster']").val();
+        $.get(`${url}/vttq/server?id=${id}`, function (data, status) {
+            $("select[name='server']").empty();
+            data.forEach(element => {
+                $("select[name='server']").append(new Option(`S${element.server} - ${element.server_name}`, element.server));
+            });
+        });
+    })
+
+    $("#btnRegist").click(() => {
+        if (validate()) {
+            $.ajax({
+                url: `${url}/vttq/character`,
+                type: "POST",
+                dataType: "JSON",
+                data: $("#form").serialize(),
+                success: result => {
+                    if (result.code == "ER_DUP_ENTRY") {
+                        $("#message").addClass("alert-danger");
+                        $("#message").text("Tài khoản này đã được đăng ký!");
+                    } else {
+                        $("#message").addClass("alert-success");
+                        $("#message").text("bạn đã đăng ký thành công, vui lòng lưu lại mã sau: " + result);
+                    }
+                }
+            })
+        } else {
+            $("#message").addClass("alert-danger");
+            $("#message").text("Sai thông tin vui lòng kiểm tra lại");
+        }
+
+    })
+    function validate() {
+        var id_game = $("input[name = 'id']").val();
+        var server_game = $("select[name = 'server']").val();
+        var id_game_subtr = id_game.substr(0, id_game.length - 7);
+        var prefix = server_game % 2 == 0 ? "1" : "6"; 
+        var regex = new RegExp(`^${Math.floor(server_game/2)}${prefix}\\d{7}`);
+        if(id_game.match(regex)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
+
+</html>
