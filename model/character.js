@@ -10,8 +10,8 @@ var Character = {
   },
   addCharacter: function (uuid_value, character, callback) {
     return db.query(
-      "Insert into character_vttq(id, id_game,name_game,server_game) values(?,?,?,?);",
-      [uuid_value, character.id, character.name, character.server],
+      "Insert into character_vttq(id, id_game, name_game, server_game, create_date) values(?,?,?,?, ?);",
+      [uuid_value, character.id, character.name, character.server, new Date()],
       callback
     );
   },
@@ -20,7 +20,7 @@ var Character = {
   },
   updateCharacter: function (id, character, callback) {
     return db.query(
-      "update character set name_game=?,server_game=? where id_game=?",
+      "update character set name_game=?, server_game=? where id_game=?",
       [character.name, character.server, id],
       callback
     );
